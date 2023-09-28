@@ -75,7 +75,8 @@ postRouter.patch("/:id/like",auth,async(req,res)=>{
     const {id}=req.params;
     const post=await PostModel.findOne({_id:id})
     try {
-        const update=await PostModel.findByIdAndUpdate({_id:id},{...req.body})
+        const like=post.likes+1;
+        const update=await PostModel.findByIdAndUpdate({_id:id},{...req.body,likes:like})
         res.status(201).send({"msg":"Likes has been updated"})
     } catch (error) {
         res.status(500).send({"error":"Internal server Error"})
@@ -86,7 +87,10 @@ postRouter.patch("/:id/comment",auth,async(req,res)=>{
     const {id}=req.params;
     const post=await PostModel.findOne({_id:id})
     try {
-        const update=await PostModel.findByIdAndUpdate({_id:id},{...req.body})
+        const comment={username:req.body.username,content:req.body.content}
+        post.comments.push(comment)
+        const update=await PostModel.findByIdAndUpdate({_id:id},post)
+        res.status(201).send({"msg":"Comments has been updated"})
     } catch (error) {
         res.status(500).send({"error":"Internal server Error"})
     }
